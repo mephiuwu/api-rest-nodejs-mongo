@@ -16,10 +16,11 @@ export const authToken = (req, res, next) => {
     } catch (error) {
 
         const TokenVerificationErrors = {
-            ["invalid signature"]: "La firma del JWT no es válida",
-            ["JWT expired"]: "JWT Expirado",
-            ["invalid token"]: "Token no válido",
-            ["No Bearer"]: "Utiliza formato Bearer",
+            "invalid signature": "La firma del JWT no es válida",
+            "JWT expired": "JWT Expirado",
+            "invalid token": "Token no válido",
+            "No Bearer": "Utiliza formato Bearer",
+            "jwt malformed": "JWT formato no válido",
         };
 
         return res.status(401).send({error: TokenVerificationErrors[error.message]});
