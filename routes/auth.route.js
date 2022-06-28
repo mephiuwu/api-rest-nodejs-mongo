@@ -1,8 +1,8 @@
 import { Router } from "express";
-import { body } from "express-validator";
 import { infoUser, login, logout, refreshToken, register } from "../controllers/auth.controller.js";
-import { authToken } from "../middlewares/authToken.js";
-import { validationResultExpress } from "../middlewares/validationResultExpress.js";
+import { requireRefreshToken } from "../middlewares/requireRefreshToken.js";
+import { requireToken } from "../middlewares/requireToken.js";
+import { bodyLoginValidator, bodyRegisterValidator } from "../middlewares/validatorManager.js";
 
 const router = Router();
 
@@ -14,48 +14,15 @@ router.<METODO>(
     body('<PARÁMETRO>','<MENSAJE PERSONALIZADO>').<VALIDACIÓN>(),
     ],
     <MIDDLEWARE>,
-    <CONSTANTE DESDE CONTROLADOR>
+    <MÉTODO CONTROLADOR>
 )
 */
 
-router.post(
-    '/register', 
-    [
-        body('email', 'Formato de email incorrecto')
-            .trim()
-            .isEmail()
-            .normalizeEmail(),
-        body('password', 'Formato de password incorrecta')
-            .trim()
-            .isLength({min: 6})
-            .custom((value, {req}) => {
-                if (value != req.body.repassword) {
-                    throw new Error('No coinciden las contraseñas');
-                }
-                return value;
-            }),
-    ],
-    validationResultExpress,
-    register
-);
+router.post('/register', bodyRegisterValidator, register);
+router.post('/login', bodyLoginValidator, login);
 
-router.post(
-    '/login', 
-    [
-        body('email', 'Formato de email incorrecto')
-            .trim()
-            .isEmail()
-            .normalizeEmail(),
-        body('password', 'Formato de password incorrecta')
-            .trim()
-            .isLength({min: 6}),
-    ],
-    validationResultExpress,
-    login
-);
-
-router.get('/protected', authToken, infoUser);
-router.get("/refresh", refreshToken);
+router.get('/protected', requireToken, infoUser);
+router.get("/refresh", requireRefreshToken , refreshToken);
 router.get("/logout", logout);
 
 export default router;

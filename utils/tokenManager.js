@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import { errorTokens } from "../helpers/errorTokens.js";
 
 export const generateToken = (uid) => {
 
@@ -23,14 +24,6 @@ export const generateRefreshToken = (uid, res) => {
             expires: new Date(Date.now() + expiresIn * 1000),
         });
     } catch (error) {
-        console.log(error);
+        return res.status(401).json({ error: errorTokens(error.message) });
     }
-};
-
-export const tokenVerificationErrors = {
-    "invalid signature": "La firma del JWT no es válida",
-    "jwt expired": "JWT expirado",
-    "invalid token": "Token no válido",
-    "No Bearer": "Utiliza formato Bearer",
-    "jwt malformed": "JWT formato no válido",
 };

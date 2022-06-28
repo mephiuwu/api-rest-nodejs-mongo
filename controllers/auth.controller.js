@@ -58,30 +58,16 @@ export const infoUser = async (req, res) => {
         const user = await User.findById(req.uid).lean();
         return res.json({ email: user.email });
     } catch (error) {
-        return res.status(401).json({ error: error.message });
+        return res.status(500).json({ error: "error de server" });
     }
 }
 
 export const refreshToken = (req, res) => {
     try {
-        const refreshTokenCookie = req.cookies.refreshToken;
-
-        if(!refreshTokenCookie) throw new Error('No existe el token');
-
-        //retorna el payload, lo que sería la información del usuario, para extraer el id del user
-        const {uid} = jwt.verify(refreshTokenCookie, process.env.JWT_REFRESH);
-        const {token , expiresIn} = generateToken(uid);
-
+        const {token , expiresIn} = generateToken(req.uid);
         return res.json({token, expiresIn});
     } catch (error) {
-        const TokenVerificationErrors = {
-            "invalid signature": "La firma del JWT no es válida",
-            "JWT expired": "JWT Expirado",
-            "invalid token": "Token no válido",
-            "No Bearer": "Utiliza formato Bearer",
-        };
-
-        return res.status(401).send({error: TokenVerificationErrors[error.message]});
+        return res.status(500).json({ error: "error de server" });
     }
 }
 
